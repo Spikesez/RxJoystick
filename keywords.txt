@@ -1,0 +1,9 @@
+
+RxJoystick	KEYWORD1
+
+channel	KEYWORD2
+setPin	KEYWORD2
+setCalibration	KEYWORD2
+getPulseWidth	KEYWORD2
+getJoystickValue	KEYWORD2
+
