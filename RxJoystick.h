@@ -5,6 +5,7 @@
 #include <Arduino.h>
 
 typedef void (*FnPtr)();
+typedef void (usb_joystick_class::*JsPtr)(unsigned int);
 
 class RxJoystick {
 
@@ -21,26 +22,26 @@ class RxJoystick {
         /**
          * Set the calibration data while setting the pin which will also turn off auto calibration.
          */
-        void setPin(uint8_t pin, uint32_t minValue, uint32_t midValue, uint32_t maxValue);
+        void setPin(uint8_t pin, uint16_t minValue, uint16_t midValue, uint16_t maxValue);
 
         /**
          * Set calibration data for min/mid/max values on the transmitter joysticks.
          *
          * Once this method is called, auto calibrate will be automatically disabled.
          */
-        void setCalibration(uint32_t minValue = 0, uint32_t midValue = 0, uint32_t maxValue = 0);
+        void setCalibration(uint16_t minValue = 0, uint16_t midValue = 0, uint16_t maxValue = 0);
 
         /**
          * Get the raw pwm value sent from the receiver.
          */
-        uint32_t getPulseWidth();
+        uint16_t getPulseWidth();
 
         /**
          * Convert the PWM value to the joystick value.
          *
          * @todo Fix this to support a midrange value in case the range on TX isn't linear.
          */
-        uint32_t getJoystickValue();
+        uint16_t getJoystickValue();
 
         /**
          * Get channel by index
@@ -52,17 +53,17 @@ class RxJoystick {
         /**
          * Total number of channels on the receiver that are connected to interrupt pins on teensy.
          */
-        const static uint32_t numChannels = 6;
+        const static uint8_t numChannels = 6;
         
         /**
          * Min value of the Joystick library. Used to scale the pwm value to joystick commands.
          */
-        const static uint32_t minJoystick = 0;
+        const static uint16_t minJoystick = 0;
 
         /**
          * Max value of the Joystick library. Used to scale the pwm value to joystick commands.
          */
-        const static uint32_t maxJoystick = 1023;
+        const static uint16_t maxJoystick = 1023;
 
         /**
          * The channel number (0-5)
@@ -102,12 +103,12 @@ class RxJoystick {
         /**
          * The current pulse width value.
          */
-        volatile uint32_t pulseWidth;
+        volatile uint16_t pulseWidth;
 
         /**
          * The min, mid, and max values for joystick calibration.
          */
-        volatile uint32_t calibration[3];
+        volatile uint16_t calibration[3];
 
         /**
          * List of channel instances.
@@ -127,8 +128,6 @@ class RxJoystick {
 
         /**
          * Set the joystick value and pass it to the usb interface.
-         *
-         * @todo Figure out where to map the 5th and 6th channels.
          */
         void setJoystick();
 
@@ -139,6 +138,14 @@ class RxJoystick {
          */
         static void isr0(), isr1(), isr2(), isr3(), isr4(), isr5();
         const FnPtr handlers[6] = { isr0, isr1, isr2, isr3, isr4, isr5 };
+        JsPtr jsHandlers[6] = { 
+            &usb_joystick_class::Y,
+            &usb_joystick_class::Zrotate,
+            &usb_joystick_class::Z,
+            &usb_joystick_class::X,
+            &usb_joystick_class::sliderRight,
+            &usb_joystick_class::sliderLeft 
+        };
 };
 
 #endif

@@ -3,9 +3,9 @@
 
 RxJoystick rxj;
 
-const uint32_t minValues[] = { 1007, 1006,  975,  991, 1005, 1481 };
-const uint32_t midValues[] = { 1493, 1500, 1466, 1492, 1495, 1490 };
-const uint32_t maxValues[] = { 1979, 1993, 1956, 1992, 1984, 1489 };
+const uint16_t minValues[] = { 1000, 1000, 1000, 1000, 1000, 1000 };
+const uint16_t midValues[] = { 1500, 1500, 1500, 1500, 1500, 1500 };
+const uint16_t maxValues[] = { 2000, 2000, 2000, 2000, 2000, 2000 };
 
 const uint8_t pins[] = {
     23, // Throttle

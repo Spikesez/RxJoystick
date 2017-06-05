@@ -23,7 +23,7 @@ void RxJoystick::setPin(uint8_t pin) {
     attachInterrupt(this->interrupt, handlers[this->channel_], CHANGE);
 }
 
-void RxJoystick::setPin(uint8_t pin, uint32_t minValue, uint32_t midValue, uint32_t maxValue) {
+void RxJoystick::setPin(uint8_t pin, uint16_t minValue, uint16_t midValue, uint16_t maxValue) {
     this->setPin(pin);
     this->setCalibration(minValue, midValue, maxValue);
 }
@@ -32,7 +32,7 @@ RxJoystick* RxJoystick::channel(uint8_t ch) {
     return channels[ch];
 }
 
-void RxJoystick::setCalibration(uint32_t minValue, uint32_t midValue, uint32_t maxValue) {
+void RxJoystick::setCalibration(uint16_t minValue, uint16_t midValue, uint16_t maxValue) {
     this->calibrating = false;
     this->calibration[0] = minValue;
     this->calibration[1] = midValue;
@@ -50,7 +50,7 @@ void RxJoystick::handleChange() {
     uint32_t interruptTime = micros();
 
     if (value == 1) {
-        prevTime = interruptTime;
+        this->prevTime = interruptTime;
         return;
     }
 
@@ -69,38 +69,16 @@ void RxJoystick::handleChange() {
     this->setJoystick();
 }
 
-uint32_t RxJoystick::getJoystickValue() {
-    uint32_t val = map(this->pulseWidth, this->calibration[0], this->calibration[2], this->minJoystick, this->maxJoystick);
+uint16_t RxJoystick::getJoystickValue() {
+    uint16_t val = map(this->pulseWidth, this->calibration[0], this->calibration[2], this->minJoystick, this->maxJoystick);
     return constrain(val, this->minJoystick, this->maxJoystick);
 }
 
 void RxJoystick::setJoystick() {
-    uint32_t jv = this->getJoystickValue();
-
-    switch (this->channel_) {
-        case 0:
-            Joystick.Y(jv);
-            break;
-        case 1:
-            Joystick.Zrotate(jv);
-            break;
-        case 2:
-            Joystick.Z(jv);
-            break;
-        case 3:
-            Joystick.X(jv);
-            break;
-        case 4:
-            // @todo this channel should map to a button since it's a toggle switch
-            Joystick.sliderRight(jv);
-            break;
-        case 5:
-            Joystick.sliderLeft(jv);
-            break;
-    }
+    (Joystick.*jsHandlers[this->channel_])(this->getJoystickValue());
 }
 
-uint32_t RxJoystick::getPulseWidth() { return this->pulseWidth; }
+uint16_t RxJoystick::getPulseWidth() { return this->pulseWidth; }
 
 void RxJoystick::isr0() { channels[0]->handleChange(); }
 void RxJoystick::isr1() { channels[1]->handleChange(); }
