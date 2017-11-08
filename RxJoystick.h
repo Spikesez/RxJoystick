@@ -78,6 +78,18 @@ class RxJoystick {
         uint8_t channel_;
 
         /**
+         * Maps receiver channels to joystick methods. See https://www.pjrc.com/teensy/td_joystick.html
+         */
+        JsPtr jsHandlers[6] = { 
+            &usb_joystick_class::Y,
+            &usb_joystick_class::Zrotate,
+            &usb_joystick_class::Z,
+            &usb_joystick_class::X,
+            &usb_joystick_class::sliderRight,
+            &usb_joystick_class::sliderLeft 
+        };
+
+        /**
          * The digital pin number where this channel is plugged into the Teensy.
          */
         uint8_t pin;
@@ -138,14 +150,6 @@ class RxJoystick {
          */
         static void isr0(), isr1(), isr2(), isr3(), isr4(), isr5();
         const FnPtr handlers[6] = { isr0, isr1, isr2, isr3, isr4, isr5 };
-        JsPtr jsHandlers[6] = { 
-            &usb_joystick_class::Y,
-            &usb_joystick_class::Zrotate,
-            &usb_joystick_class::Z,
-            &usb_joystick_class::X,
-            &usb_joystick_class::sliderRight,
-            &usb_joystick_class::sliderLeft 
-        };
 };
 
 #endif
